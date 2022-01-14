@@ -1,12 +1,11 @@
-
 FROM mcr.microsoft.com/powershell:7.1.0-ubuntu-18.04
-
-ENV CRON_PATH /etc/crontabs
 
 # base installs
 RUN apt-get update
-RUN apt-get install -y curl nano nodejs supervisor tzdata
-RUN apt-get install -y npm
+RUN apt-get install -y curl nano supervisor tzdata cron
+RUN curl -sL https://deb.nodesource.com/setup_16.x -o nodesource_setup.sh
+RUN bash nodesource_setup.sh
+
 
 # install powershell
 RUN apt-get install -y wget apt-transport-https software-properties-common 
@@ -25,7 +24,7 @@ RUN pwsh -c Install-Module -Name PSWSMan -Scope AllUsers
 RUN pwsh -c Install-WSMan
 
 # install crontab-ui
-RUN npm install -g crontab-ui
+RUN npm install -g crontab-ui -force
 RUN mkdir /crontab-ui
 VOLUME /crontab-ui
 
