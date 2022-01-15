@@ -2,9 +2,20 @@ FROM mcr.microsoft.com/powershell:7.1.0-ubuntu-18.04
 
 # base installs
 RUN apt-get update
-RUN apt-get install -y curl nano supervisor tzdata cron
+RUN apt-get install -y curl nano supervisor cron gcc g++ make
 RUN curl -sL https://deb.nodesource.com/setup_16.x -o nodesource_setup.sh
 RUN bash nodesource_setup.sh
+RUN apt-get update
+RUN apt-get install -y nodejs
+
+# set timezone
+ENV TZ 'America/New_York'
+RUN echo $TZ > /etc/timezone && \
+    apt-get update && apt-get install -y tzdata && \
+    rm /etc/localtime && \
+    ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
+    dpkg-reconfigure -f noninteractive tzdata && \
+    apt-get clean
 
 
 # install powershell
@@ -24,6 +35,7 @@ RUN pwsh -c Install-Module -Name PSWSMan -Scope AllUsers
 RUN pwsh -c Install-WSMan
 
 # install crontab-ui
+RUN npm -v
 RUN npm install -g crontab-ui -force
 RUN mkdir /crontab-ui
 VOLUME /crontab-ui
